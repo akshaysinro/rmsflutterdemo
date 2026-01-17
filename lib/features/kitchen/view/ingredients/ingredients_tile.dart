@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rms/features/kitchen/presenter/ingredient_presenter.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../presentation/bloc/ingredient/ingredient_bloc.dart';
 
 class IngredientTileUI extends StatelessWidget {
-  final IngredientPresenter kitchenPresenter;
-  const IngredientTileUI({super.key, required this.kitchenPresenter});
+  const IngredientTileUI({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        kitchenPresenter.onIngridientsTilePressed(context);
+        context.read<IngredientBloc>().router.navigateToIngredietsDetails(
+          context,
+        );
       },
       child: Container(
         padding: const EdgeInsets.all(16),

@@ -1,3 +1,6 @@
+import 'package:dartz/dartz.dart';
+import 'package:flutter_rms/common/error/errors.dart';
+import 'package:flutter_rms/features/kitchen/data/ingredient_model.dart';
 import 'package:flutter_rms/features/kitchen/domain/repositry/i_kitchen_repository.dart';
 import 'package:injectable/injectable.dart';
 
@@ -7,7 +10,7 @@ class IngredientInteractor {
 
   IngredientInteractor({required this.ingredientRepository});
 
-  Future executeGetIngredients() async {
+  Future<Either<MainFailure, List<IngredientModel>>> executeGetIngredients() async {
     return await ingredientRepository.fetchIngredients();
   }
 

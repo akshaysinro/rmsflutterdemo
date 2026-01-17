@@ -1,87 +1,114 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../presentation/bloc/recipe/recipe_bloc.dart';
+import '../presentation/bloc/recipe/recipe_event.dart';
+import '../presentation/bloc/recipe/recipe_state.dart';
 import 'package:flutter_rms/features/kitchen/view/recipie_form.dart';
 import 'package:flutter_rms/features/kitchen/view/widgets/recipie_list_tile.dart';
-import '../presenter/recipe_presenter.dart';
 
-class RecipeListingPage extends StatelessWidget {
-  final RecipePresenter presenter;
+class RecipeListingPage extends StatefulWidget {
+  const RecipeListingPage({super.key});
 
-  const RecipeListingPage({super.key, required this.presenter});
+  @override
+  State<RecipeListingPage> createState() => _RecipeListingPageState();
+}
+
+class _RecipeListingPageState extends State<RecipeListingPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<RecipeBloc>().add(const RecipeEvent.initialize());
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: const Text(
-          "RECIPE BOOK",
-          style: TextStyle(
-            color: Color(0xFF1A1A1A),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          // ADD NEW OPTION
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ElevatedButton.icon(
-              onPressed: () {
-                presenter.onIngridientsPressed(context);
-              }, // Action for Add New
-              // icon: const Icon(Icons.add, size: 18),
-              label: const Text("Ingredients"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade700,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+    return BlocBuilder<RecipeBloc, RecipeState>(
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFF5F5F7),
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.white,
+            title: const Text(
+              "RECIPE BOOK",
+              style: TextStyle(
+                color: Color(0xFF1A1A1A),
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ElevatedButton.icon(
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled:
-                      true, // Crucial for full height and keyboard handling
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => RecipeFormSheet(presenter: presenter),
-                );
-              }, // Action for Add New
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text("NEW RECIPE"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade700,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    context
+                        .read<RecipeBloc>()
+                        .router
+                        .navigateToIngredietsListing(context);
+                  },
+                  label: const Text("Ingredients"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade700,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => const RecipeFormSheet(),
+                    );
+                  },
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text("NEW RECIPE"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade700,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            shape: const Border(
+              bottom: BorderSide(color: Color(0xFFE0E0E0), width: 1),
             ),
           ),
-        ],
-        shape: const Border(
-          bottom: BorderSide(color: Color(0xFFE0E0E0), width: 1),
-        ),
-      ),
-      body: Column(
-        children: [
-          _buildSearchAndFilters(),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: 10, // Dummy count
-              itemBuilder: (context, index) =>
-                  RecipeListTileUI(presenter: presenter),
-            ),
+          body: Column(
+            children: [
+              _buildSearchAndFilters(),
+              Expanded(
+                child: state.when(
+                  initial: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  loadSuccess: () => ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: 10,
+                    itemBuilder: (context, index) => const RecipeListTileUI(),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

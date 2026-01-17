@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import '../presenter/recipe_presenter.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../presentation/bloc/recipe/recipe_bloc.dart';
 
 class RecipeFormSheet extends StatelessWidget {
-  final RecipePresenter presenter;
-
-  const RecipeFormSheet({super.key, required this.presenter});
+  const RecipeFormSheet({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +88,8 @@ class RecipeFormSheet extends StatelessWidget {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () => presenter.onBackPressed(context),
+                  onPressed: () =>
+                      context.read<RecipeBloc>().router.goBack(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue.shade700,
                     shape: RoundedRectangleBorder(
@@ -121,7 +121,7 @@ class RecipeFormSheet extends StatelessWidget {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         IconButton(
-          onPressed: () => presenter.onBackPressed(context),
+          onPressed: () => context.read<RecipeBloc>().router.goBack(context),
           icon: const Icon(Icons.close, color: Colors.grey),
         ),
       ],

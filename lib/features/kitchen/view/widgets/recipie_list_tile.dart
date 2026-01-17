@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../presenter/recipe_presenter.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../presentation/bloc/recipe/recipe_bloc.dart';
 
 class RecipeListTileUI extends StatelessWidget {
-  final RecipePresenter presenter;
-  const RecipeListTileUI({super.key, required this.presenter});
+  const RecipeListTileUI({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class RecipeListTileUI extends StatelessWidget {
       ),
       child: GestureDetector(
         onTap: () {
-          presenter.onRecipeDetailsPressed(context);
+          context.read<RecipeBloc>().router.navigateToRecipeDetails(context);
         },
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(

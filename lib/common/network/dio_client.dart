@@ -1,9 +1,10 @@
 import 'package:injectable/injectable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rms/common/network/api_client.dart.dart';
+import 'package:flutter_rms/common/network/api_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_rms/common/server.dart';
 
+@LazySingleton(as: IApiClient)
 class DioApiClient implements IApiClient {
   final Dio _dio = Dio();
 

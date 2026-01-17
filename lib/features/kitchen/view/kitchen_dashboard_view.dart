@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rms/features/kitchen/view/widgets/kot_card.dart';
-import '../presenter/kot_presenter.dart';
+import '../presentation/bloc/kot/kot_bloc.dart';
+import '../presentation/bloc/kot/kot_event.dart';
+import '../presentation/bloc/kot/kot_state.dart';
 
 class KitchenDashboardPage extends StatefulWidget {
-  final KotPresenter presenter;
-
-  const KitchenDashboardPage({super.key, required this.presenter});
+  const KitchenDashboardPage({super.key});
 
   @override
   State<KitchenDashboardPage> createState() => _KitchenDashboardPageState();
@@ -15,53 +16,62 @@ class _KitchenDashboardPageState extends State<KitchenDashboardPage> {
   @override
   void initState() {
     super.initState();
-    widget.presenter.onLoadKots();
+    context.read<KotBloc>().add(const KotEvent.initialize());
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // Light grey background for better contrast with white cards
-      backgroundColor: const Color(0xFFF5F5F7),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        centerTitle: false,
-        title: const Text(
-          "KITCHEN DISPLAY SYSTEM",
-          style: TextStyle(
-            color: Color(0xFF1A1A1A),
-            letterSpacing: 1.2,
-            fontWeight: FontWeight.bold,
+    return BlocBuilder<KotBloc, KotState>(
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFF5F5F7),
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.white,
+            centerTitle: false,
+            title: const Text(
+              "KITCHEN DISPLAY SYSTEM",
+              style: TextStyle(
+                color: Color(0xFF1A1A1A),
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            actions: [
+              _buildMetricChip(
+                "Recipes",
+                Colors.green.shade700,
+                onPressed: () => context
+                    .read<KotBloc>()
+                    .router
+                    .navigateToRecipeBook(context),
+              ),
+              _buildMetricChip("ACTIVE: 12", Colors.blue.shade700),
+              _buildMetricChip("DELAYED: 3", Colors.red.shade700),
+              const SizedBox(width: 16),
+            ],
+            shape: const Border(
+              bottom: BorderSide(color: Color(0xFFE0E0E0), width: 1),
+            ),
           ),
-        ),
-        actions: [
-          _buildMetricChip(
-            "Recipies",
-            Colors.green.shade700,
-            onPressed: () => widget.presenter.onRecipeBookPressed(context),
+          body: state.when(
+            initial: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            loadFailure: (message) => Center(child: Text(message)),
+            loadSuccess: (kots) => GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.7,
+              ),
+              itemCount: 8, // Use kots.length in real implementation
+              itemBuilder: (context, index) => const KOTCardUI(),
+            ),
           ),
-
-          _buildMetricChip("ACTIVE: 12", Colors.blue.shade700),
-          _buildMetricChip("DELAYED: 3", Colors.red.shade700),
-
-          const SizedBox(width: 16),
-        ],
-        shape: const Border(
-          bottom: BorderSide(color: Color(0xFFE0E0E0), width: 1),
-        ),
-      ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 0.7,
-        ),
-        itemCount: 8,
-        itemBuilder: (context, index) => KOTCardUI(presenter: widget.presenter),
-      ),
+        );
+      },
     );
   }
 

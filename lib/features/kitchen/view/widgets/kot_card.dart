@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../presenter/kot_presenter.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../presentation/bloc/kot/kot_bloc.dart';
 
 class KOTCardUI extends StatelessWidget {
-  final KotPresenter presenter;
-  const KOTCardUI({super.key, required this.presenter});
+  const KOTCardUI({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -79,19 +79,9 @@ class KOTCardUI extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                _KOTItemRow(
-                  qty: 2,
-                  name: "Truffle Burger",
-                  note: "No Onions",
-                  presenter: presenter,
-                ),
-                _KOTItemRow(
-                  qty: 1,
-                  name: "Classic Fries",
-                  note: "Extra Salt",
-                  presenter: presenter,
-                ),
-                _KOTItemRow(qty: 3, name: "Coke Zero", presenter: presenter),
+                _KOTItemRow(qty: 2, name: "Truffle Burger", note: "No Onions"),
+                _KOTItemRow(qty: 1, name: "Classic Fries", note: "Extra Salt"),
+                _KOTItemRow(qty: 3, name: "Coke Zero"),
               ],
             ),
           ),
@@ -196,14 +186,8 @@ class _KOTItemRow extends StatelessWidget {
   final int qty;
   final String name;
   final String? note;
-  final KotPresenter presenter;
 
-  const _KOTItemRow({
-    required this.qty,
-    required this.name,
-    this.note,
-    required this.presenter,
-  });
+  const _KOTItemRow({required this.qty, required this.name, this.note});
 
   @override
   Widget build(BuildContext context) {
@@ -245,7 +229,9 @@ class _KOTItemRow extends StatelessWidget {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(20),
                   onTap: () {
-                    presenter.onRecipeDetailsPressed(context);
+                    context.read<KotBloc>().router.navigateToRecipeDetails(
+                      context,
+                    );
                   },
                   child: Container(
                     padding: const EdgeInsets.all(6),
